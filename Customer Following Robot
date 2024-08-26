@@ -1,0 +1,95 @@
+// Pins for IR sensors
+const int leftIRPin = 2; 
+const int rightIRPin = 3; 
+
+// Pins for motor driver (L298N)
+const int leftMotor1Pin = 9; 
+const int leftMotor2Pin = 10; 
+const int rightMotor1Pin = 7; 
+const int rightMotor2Pin = 8; 
+const int enableLeftPin = 6; 
+const int enableRightPin = 5; 
+
+// Pins for ultrasonic sensor
+const int trigPin = 11; 
+const int echoPin = 12; 
+
+void setup() {
+  pinMode(leftIRPin, INPUT);
+  pinMode(rightIRPin, INPUT);
+  
+  pinMode(leftMotor1Pin, OUTPUT);
+  pinMode(leftMotor2Pin, OUTPUT);
+  pinMode(rightMotor1Pin, OUTPUT);
+  pinMode(rightMotor2Pin, OUTPUT);
+  
+  pinMode(enableLeftPin, OUTPUT);
+  pinMode(enableRightPin, OUTPUT);
+  
+  // Set initial speed
+  analogWrite(enableLeftPin, 120);
+  analogWrite(enableRightPin, 120);
+  
+  // Ultrasonic sensor
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+void loop() {
+  // Read IR sensors
+  int leftIRValue = digitalRead(leftIRPin);
+  int rightIRValue = digitalRead(rightIRPin);
+
+  // Read ultrasonic sensor
+  long duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration / 2) / 29.1; // Calculate distance in centimeters
+
+  // Actions based on sensor readings
+  if (distance >= 3 && distance <= 10) {
+    // Move forward
+    moveForward();
+  } else if (leftIRValue == LOW && rightIRValue == HIGH) {
+    // Turn left
+    turnLeft();
+  } else if (leftIRValue == HIGH && rightIRValue == LOW) {
+    // Turn right
+    turnRight();
+  } else {
+    // Stop
+    stopRobot();
+  }
+}
+
+void moveForward() {
+  digitalWrite(leftMotor1Pin, HIGH);
+  digitalWrite(leftMotor2Pin, LOW);
+  digitalWrite(rightMotor1Pin, LOW);
+  digitalWrite(rightMotor2Pin, HIGH);
+}
+
+void turnLeft() {
+  digitalWrite(leftMotor1Pin, LOW);
+  digitalWrite(leftMotor2Pin, HIGH);
+  digitalWrite(rightMotor1Pin, LOW);
+  digitalWrite(rightMotor2Pin, HIGH);
+}
+
+void turnRight() {
+  digitalWrite(leftMotor1Pin, HIGH);
+  digitalWrite(leftMotor2Pin, LOW);
+  digitalWrite(rightMotor1Pin, HIGH);
+  digitalWrite(rightMotor2Pin, LOW);
+}
+
+void stopRobot() {
+  digitalWrite(leftMotor1Pin, LOW);
+  digitalWrite(leftMotor2Pin, LOW);
+  digitalWrite(rightMotor1Pin, LOW);
+  digitalWrite(rightMotor2Pin, LOW);
+}
